@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define TAMANHO_TABULEIRO 10
 int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO] = {0};
 
 void navioHorizontal(int coluna, int startLinha) {
-        // Posicionando um navio verticalmente (3 partes) na coluna 1
         if (coluna >= 5) {
              printf("Menor que 5:\n");
             return;
@@ -20,12 +20,12 @@ void navioHorizontal(int coluna, int startLinha) {
 }
 
 void navioVertical(int linha, int startcoluna) {
-        // Posicionando um navio verticalmente (3 partes) na coluna 1
         if (startcoluna >= 5) {
              printf("Menor que 5:\n");
             return;
         }
         linha -= 1;
+
   // Posicionando um navio horizontalmente (4 partes) na linha 3
     tabuleiro[linha][startcoluna] = 3;  // Parte 1
     tabuleiro[linha + 1][startcoluna] = 3;  // Parte 2
@@ -34,7 +34,6 @@ void navioVertical(int linha, int startcoluna) {
 
 }
 
-// Função para posicionar navio diagonalmente
 void navioDiagonal(int linha, int coluna) {
     if (linha + 4 >= TAMANHO_TABULEIRO || coluna + 4 >= TAMANHO_TABULEIRO) {
         printf("Erro: O navio ultrapassa os limites diagonalmente.\n");
@@ -48,7 +47,6 @@ void navioDiagonal(int linha, int coluna) {
     tabuleiro[linha + 4][coluna + 4] = 3; // Parte 5
 }
 
-// Função para exibir o tabuleiro
 void exibirTabuleiro() {
     for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
         for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
@@ -58,9 +56,60 @@ void exibirTabuleiro() {
     }
 }
 
+
+void limparTabuleiro() {
+    for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
+        for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
+            tabuleiro[i][j] = 0;
+        }
+    }
+}
+
+void habilidadeCone(int linha, int coluna) {
+    int alcance = 2; // Alcance do cone
+    for (int i = 0; i <= alcance; i++) {
+        for (int j = -i; j <= i; j++) {
+            int novaLinha = linha + i;
+            int novaColuna = coluna + j;
+            if (novaLinha >= 0 && novaLinha < TAMANHO_TABULEIRO &&
+                novaColuna >= 0 && novaColuna < TAMANHO_TABULEIRO) {
+                tabuleiro[novaLinha][novaColuna] = 1;
+            }
+        }
+    }
+}
+
+void habilidadeCruz(int linha, int coluna) {
+    int alcance = 2; // Alcance da cruz
+    for (int i = -alcance; i <= alcance; i++) {
+        if (linha + i >= 0 && linha + i < TAMANHO_TABULEIRO) {
+            tabuleiro[linha + i][coluna] = 1; // Linha vertical
+        }
+        if (coluna + i >= 0 && coluna + i < TAMANHO_TABULEIRO) {
+            tabuleiro[linha][coluna + i] = 1; // Linha horizontal
+        }
+    }
+}
+
+void habilidadeOctaedro(int linha, int coluna) {
+    int alcance = 2; // Alcance do octaedro
+    for (int i = -alcance; i <= alcance; i++) {
+        for (int j = -alcance + abs(i); j <= alcance - abs(i); j++) {
+            int novaLinha = linha + i;
+            int novaColuna = coluna + j;
+            if (novaLinha >= 0 && novaLinha < TAMANHO_TABULEIRO &&
+                novaColuna >= 0 && novaColuna < TAMANHO_TABULEIRO) {
+                tabuleiro[novaLinha][novaColuna] = 1;
+            }
+        }
+    }
+}
+
+
 int main() {
     int direcao = 0;
     int linha, coluna;
+    int escolha;
     char continuar;
 
  do {
@@ -69,22 +118,41 @@ int main() {
         printf("1- Horizontal\n");
         printf("2- Vertical\n");
         printf("3- Diagonal\n");
-        scanf("%d", &direcao);
+        printf("4- Cone\n");
+        printf("5- Cruz\n");
+        printf("6- Octaedro\n");
+        scanf("%d", &escolha);
 
-        printf("Digite a linha inicial (0 a %d): ", TAMANHO_TABULEIRO - 1);
-        scanf("%d", &linha);
-        printf("Digite a coluna inicial (0 a %d): ", TAMANHO_TABULEIRO - 1);
-        scanf("%d", &coluna);
 
-        // Chama a função de posicionamento correspondente
-        if (direcao == 1) {
-            navioHorizontal(linha, coluna);
-        } else if (direcao == 2) {
-            navioVertical(linha, coluna);
-        } else if (direcao == 3) {
-            navioDiagonal(linha, coluna);
-        } else {
-            printf("Direção inválida.\n");
+              printf("Digite a linha inicial (0 a %d): ", TAMANHO_TABULEIRO - 1);
+              scanf("%d", &linha);
+              printf("Digite a coluna inicial (0 a %d): ", TAMANHO_TABULEIRO - 1);
+              scanf("%d", &coluna);
+        
+      
+          switch (escolha) {
+            case 1:
+                navioHorizontal(linha, coluna);
+                break;
+            case 2:
+                navioVertical(linha, coluna);
+                break;
+            case 3:
+                navioDiagonal(linha, coluna);
+                break;
+
+            case 4:
+                habilidadeCone(linha, coluna);
+                break;
+            case 5:
+                habilidadeCruz(linha, coluna);
+                break;
+            case 6:
+                habilidadeOctaedro(linha, coluna);
+                break;
+            default:
+                printf("Habilidade inválida.\n");
+                break;
         }
 
         // Exibe o tabuleiro atualizado
